@@ -1,3 +1,5 @@
+#include <io.h>
+#include <fcntl.h>
 #include "../Common/Common.hpp"
 #include "../Common/Bitmap.hpp"
 #include "../Common/Font.hpp"
@@ -5,6 +7,7 @@
 #include "../Common/Sprite.hpp"
 
 int main(int NArg, char* Args[]) {
+    _setmode(_fileno(stdin), _O_WTEXT);
   if (NArg != 5) {
     fprintf(stderr, "Incorrect command line.\n");
     fprintf(stderr,
