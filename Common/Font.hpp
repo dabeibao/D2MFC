@@ -50,6 +50,7 @@ struct Font {
   //void ReadYml(const char* Path);
 
   void RenderGlyphs();
+  void RenderGlyphsGDI(int size);
   void Dump(Sprite& Spr, FontTable& Tbl);
 
   pair<size_t, size_t> Extent(wstring_view Str);

@@ -65,6 +65,7 @@ int main(int NArg, char* Args[]) {
   auto LnSpacingOff = d["LeadingOffset"].GetInt();
   auto CapHeight = d["CapHeight"].GetInt();
   auto OriginOffset = d["OriginOffset"].GetInt();
+  auto DescentPadding = d["DescentPadding"].GetInt();
   auto PalPath = d["pal"].GetString();
   auto Dc6Path = d["dc6name"].GetString();
   auto TblPath = d["tblname"].GetString();
@@ -98,6 +99,7 @@ int main(int NArg, char* Args[]) {
   Fnt.LnSpacingOff = LnSpacingOff;
   Fnt.CapHeight = CapHeight;
   Fnt.OriginOffset = OriginOffset;
+  Fnt.DescentPadding = DescentPadding;
   Fnt.Faces.emplace_back(FacePath);
   for (auto it = glyphlist.cbegin(); it != glyphlist.cend(); it++) {
     uint16_t Ch = *it;
@@ -110,7 +112,7 @@ int main(int NArg, char* Args[]) {
     G->HasBmp = false;
   }
   printf("Rendering glyphs...\n");
-  Fnt.RenderGlyphs();
+  Fnt.RenderGlyphsGDI(Size);
   printf("Reading palette...\n");
   Palette Pal;
   Pal.ReadDat(PalPath);

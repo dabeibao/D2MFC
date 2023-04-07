@@ -35,6 +35,12 @@ public:
     NC = C;
   }
 
+  void Shrink(size_t newH) {
+      if (NR > newH) {
+          NR = newH;
+      }
+  }
+
   void Fill(const Elem& Val) { fill(Raw(), Raw() + Count(), Val); }
   
   Elem* operator [](size_t R) noexcept { return Raw() + R * NC; }

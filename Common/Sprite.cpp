@@ -1,3 +1,4 @@
+#include <windows.h>
 #include "AutoFile.hpp"
 #include "Sprite.hpp"
 
@@ -44,6 +45,7 @@ namespace {
 #else
   void WriteDc6Frame(AutoFile& File, const Bitmap& Bmp, PalEncoder& Enc, uint32_t Mask) {
 #endif
+    vector<uint8_t> encoded;
     if (Bmp.Count()) {
       auto Done = false;
       auto y = Bmp.Height() - 1;
@@ -59,7 +61,8 @@ namespace {
 #endif
         if (x + n == Bmp.Width()) {
           // End of Line
-          File.Put<uint8_t>(0x80);
+          //File.Put<uint8_t>(0x80);
+          encoded.push_back(0x80);
           x = 0;
           n = 0;
           if (!y--)
@@ -69,11 +72,13 @@ namespace {
         if (n) {
           // Transparent
           while (n > 0x7f) {
-            File.Put<uint8_t>(0xff);
+            //File.Put<uint8_t>(0xff);
+            encoded.push_back(0xff);
             x += 0x7f;
             n -= 0x7f;
           }
-          File.Put<uint8_t>(n | 0x80);
+          //File.Put<uint8_t>(n | 0x80);
+          encoded.push_back(n | 0x80);
           x += n;
           n = 0;
         }
@@ -87,20 +92,28 @@ namespace {
         if (n) {
           // Colors
           while (n > 0x7f) {
-            File.Put<uint8_t>(0x7f);
-            for (auto i = 0u; i < 0x7f; ++i)
-              File.Put<uint8_t>(Enc.Encode(Bmp[y][x + i]));
+            //File.Put<uint8_t>(0x7f);
+            encoded.push_back(0x7f);
+            for (auto i = 0u; i < 0x7f; ++i) {
+              //File.Put<uint8_t>(Enc.Encode(Bmp[y][x + i]));
+              encoded.push_back(Enc.Encode(Bmp[y][x + i]));
+            }
+
             x += 0x7f;
             n -= 0x7f;
           }
-          File.Put<uint8_t>(n);
-          for (auto i = 0u; i < n; ++i)
-            File.Put<uint8_t>(Enc.Encode(Bmp[y][x + i]));
+          //File.Put<uint8_t>(n);
+          encoded.push_back(n);
+          for (auto i = 0u; i < n; ++i) {
+            //File.Put<uint8_t>(Enc.Encode(Bmp[y][x + i]));
+            encoded.push_back(Enc.Encode(Bmp[y][x + i]));
+          }
           x += n;
           n = 0;
         }
       }
     }
+    File.Put(encoded.data(), encoded.size());
     uint8_t Term[3]{0xee, 0xee, 0xee};
     File.Put(Term, 3);
   }
@@ -134,6 +147,7 @@ void Sprite::SaveDc6(const char* Path, const Palette& Pal) {
 #else
 void Sprite::SaveDc6(const char* Path, const Palette& Pal, uint32_t Mask) {
 #endif
+    DeleteFileA(Path);
   Dc6Header Hdr;
   Hdr.Version = Dc6HdrVer;
   Hdr.Unk1 = Dc6HdrUnk1;
